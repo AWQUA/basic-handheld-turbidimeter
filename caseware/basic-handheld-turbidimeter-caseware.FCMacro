@@ -1,0 +1,276 @@
+'''
+Copyright 2015 Chris Kelley and AWQUA
+
+     This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+
+import Part
+from FreeCAD import Base
+
+def make_top_or_bottom(batt,dx,dy,name,is_top,show):
+	twr = 0.33	#tab wiggle room
+	battery_spacer_h = 14
+	battery_spacer_w = 1
+	case_top = App.ActiveDocument.addObject('Part::Feature',name)		
+	case_top_cover = App.ActiveDocument.addObject('Part::Feature',name + "_cover")		
+
+	case_top.Shape = Part.makeBox(75,164,3)
+	case_top.Shape = case_top.Shape.makeFillet(6,[case_top.Shape.Edges[0],case_top.Shape.Edges[2],case_top.Shape.Edges[4],case_top.Shape.Edges[6]])
+
+	case_top_cover.Shape = Part.makeBox(75,164,3)
+	case_top_cover.Shape = case_top_cover.Shape.makeFillet(6,[case_top_cover.Shape.Edges[0],case_top_cover.Shape.Edges[2],case_top_cover.Shape.Edges[4],case_top_cover.Shape.Edges[6]])
+
+	cover_holes = []
+	top_holes = []
+	base_holes = []
+	#major holes
+	if is_top:
+		cover_hole = Part.makeCylinder(16.25,4,Base.Vector(37.5,120.5,0))	
+		cuvette_hole = Part.makeCylinder(16.15,4,Base.Vector(37.5,120.5,0))	
+		sevseg_hole = Part.makeBox(50.5,19.1,4,Base.Vector(12.25,59,0))
+		sevseg_window = Part.makeBox(52.5,21.1,4,Base.Vector(11.25,58,0))
+		push_button_hole = Part.makeCylinder(5,4,Base.Vector(52+3,40-6.35,0))
+		power_switch_hole = Part.makeBox(19.5,13,4,Base.Vector(17,34-6.35,0))
+		controls_envelope = Part.makeBox(49,16,4,Base.Vector(13,32-6.35,0))
+		top_holes = Part.makeCompound([cuvette_hole,sevseg_hole,push_button_hole,power_switch_hole])
+		base_holes = Part.makeCompound([])
+		cover_holes = Part.makeCompound([cover_hole, controls_envelope, sevseg_window])
+	else:
+		battery_hole1 = Part.makeBox(58,73.25,4,Base.Vector(8.5,15.75,0))
+		battery_hole1 = battery_hole1.makeFillet(6,[battery_hole1.Edges[0],battery_hole1.Edges[2],battery_hole1.Edges[4],battery_hole1.Edges[6]])
+		
+		#battery_hole2 = Part.makeBox(50,3,4,Base.Vector(12.5,15,0))
+		#case_top_cover.Shape = case_top_cover.Shape.cut(battery_hole2)
+		bsh0 = Part.makeCylinder(1.5,4,Base.Vector(18.5,112.5,0))
+		bsh1 = Part.makeCylinder(1.5,4,Base.Vector(45.5,139.5,0))
+		bsh2 = Part.makeCylinder(1.5,4,Base.Vector(56.5,128.5,0))
+		bsh3 = Part.makeCylinder(1.5,4,Base.Vector(29.5,101.5,0))
+		btsh0 = Part.makeCylinder(1.5,4,Base.Vector(18.75,20.25,0))
+		btsh1 = Part.makeCylinder(1.5,4,Base.Vector(37.5,20.25,0))
+		btsh2 = Part.makeCylinder(1.5,4,Base.Vector(56.25,20.25,0))
+		btsh3 = Part.makeCylinder(1.5,4,Base.Vector(18.75,83.75,0))
+		btsh4 = Part.makeCylinder(1.5,4,Base.Vector(37.5,83.75,0))
+		btsh5 = Part.makeCylinder(1.5,4,Base.Vector(56.25,83.75,0))
+		bhatch = Part.makeBox(56,52,4,Base.Vector(9.5,25.5,0))
+		top_holes = Part.makeCompound([])
+		cover_holes = Part.makeCompound([bsh0,bsh1,bsh2,bsh3,battery_hole1])
+		base_holes = Part.makeCompound([bsh0,bsh1,bsh2,bsh3,btsh0,btsh1,btsh2,btsh3,btsh4,btsh5,bhatch])
+	#outer_wall_holes
+	oh0 = Part.makeBox(2.7+twr,20+twr,4,Base.Vector(3-twr*0.5,32-twr*0.5,0))
+	oh1 = Part.makeBox(2.7+twr,20+twr,4,Base.Vector(3-twr*0.5,72-twr*0.5,0))
+	oh2 = Part.makeBox(2.7+twr,20+twr,4,Base.Vector(3-twr*0.5,112-twr*0.5,0))
+	oh3 = Part.makeBox(14+twr,2.7+twr,4,Base.Vector(16-twr*0.5,156-twr*0.5,0))
+	oh4 = Part.makeBox(14+twr,2.7+twr,4,Base.Vector(44.5-twr*0.5,156-twr*0.5,0))
+	oh5 = Part.makeBox(2.7+twr,20+twr,4,Base.Vector(69-twr*0.5,112-twr*0.5,0))
+	oh6 = Part.makeBox(2.7+twr,20+twr,4,Base.Vector(69-twr*0.5,72-twr*0.5,0))
+	oh7 = Part.makeBox(2.7+twr,20+twr,4,Base.Vector(69-twr*0.5,32-twr*0.5,0))
+	oh8 = Part.makeBox(14+twr,2.7+twr,4,Base.Vector(44.5-twr*0.5,5-twr*0.5,0))
+	oh9 = Part.makeBox(14+twr,2.7+twr,4,Base.Vector(16-twr*0.5,5-twr*0.5,0))
+	outer_wall_holes = Part.makeCompound([oh0,oh1,oh2,oh3,oh4,oh5,oh6,oh7,oh8,oh9])
+	
+	#inner_wall_holes
+	ih0 = Part.makeBox(2.7+twr,10+twr,4,Base.Vector(9.5-twr*0.5,105.5-twr*0.5,0))
+	ih1 = Part.makeBox(2.7+twr,10+twr,4,Base.Vector(9.5-twr*0.5,125.5-twr*0.5,0))
+	ih2 = Part.makeBox(10+twr,2.7+twr,4,Base.Vector(22.5-twr*0.5,145.5-twr*0.5,0))
+	ih3 = Part.makeBox(10+twr,2.7+twr,4,Base.Vector(42.5-twr*0.5,145.5-twr*0.5,0))
+	ih4 = Part.makeBox(2.7+twr,10+twr,4,Base.Vector(62.5-twr*0.5,125.5-twr*0.5,0))
+	ih5 = Part.makeBox(2.7+twr,10+twr,4,Base.Vector(62.5-twr*0.5,105.5-twr*0.5,0))
+	ih6 = Part.makeBox(10+twr,2.7+twr,4,Base.Vector(42.5-twr*0.5,92.5-twr*0.5,0))
+	ih7 = Part.makeBox(10+twr,2.7+twr,4,Base.Vector(22.5-twr*0.5,92.5-twr*0.5,0))
+	inner_wall_holes = Part.makeCompound([ih0,ih1,ih2,ih3,ih4,ih5,ih6,ih7])
+	
+	#screw holes
+	sh0 = Part.makeCylinder(1.5,4,Base.Vector(9.5,11.5,0))
+	sh1 = Part.makeCylinder(1.5,4,Base.Vector(9.5,138.5 + battery_spacer_h,0))
+	sh2 = Part.makeCylinder(1.5,4,Base.Vector(65.5,138.5 + battery_spacer_h,0))
+	sh3 = Part.makeCylinder(1.5,4,Base.Vector(65.5,11.5,0))
+	screw_holes = Part.makeCompound([sh0,sh1,sh2,sh3])
+	
+	#...combining them
+	all_holes = Part.makeCompound([top_holes, base_holes, outer_wall_holes, inner_wall_holes, screw_holes])
+	case_top.Shape = case_top.Shape.cut(all_holes)
+	all_holes = Part.makeCompound([cover_holes, screw_holes])
+	case_top_cover.Shape = case_top_cover.Shape.cut(all_holes)
+	placement = App.Placement(App.Vector(dx,dy,0), App.Vector(1,0,0), 0)
+	case_top.Placement = placement
+	placement = App.Placement(App.Vector(dx-80,dy,0), App.Vector(1,0,0), 0)
+	case_top_cover.Placement = placement
+	return case_top
+
+def make_outer_walls(dx,dy,name,is_long_wall,top_thickness,base_thickness,show):
+	battery_spacer_h = 12	
+	side = App.ActiveDocument.addObject('Part::Feature',name)
+	#build shape and negative space for tabs / holes
+	if is_long_wall: 
+		side.Shape = Part.makeBox(48,154,3)
+		tab0 = Part.makeBox(base_thickness,27,4,Base.Vector(0,0,0))
+		tab1 = Part.makeBox(base_thickness,20,4,Base.Vector(0,47,0))
+		tab2 = Part.makeBox(base_thickness,20,4,Base.Vector(0,87,0))
+		tab3 = Part.makeBox(base_thickness,27,4,Base.Vector(0,127,0))
+		tab4 = Part.makeBox(15,3,4,Base.Vector(16.5 ,151,0))	#reduce to 16.5 to evenly space the tab
+		tab5 = Part.makeBox(top_thickness,27,4,Base.Vector(45,127,0))
+		tab6 = Part.makeBox(top_thickness,20,4,Base.Vector(45,87,0))
+		tab7 = Part.makeBox(top_thickness,20,4,Base.Vector(45,47,0))
+		tab8 = Part.makeBox(top_thickness,27,4,Base.Vector(45,0,0))
+		tab9 = Part.makeBox(15,3,4,Base.Vector(16.5,0,0))	#reduce to 16.5 to evenly space the tab
+		tabs = Part.makeCompound([tab0,tab1,tab2,tab3,tab4,tab5,tab6,tab7,tab8,tab9])
+		side.Shape = side.Shape.cut(tabs)
+	else: 
+		side.Shape = Part.makeBox(48,70,3)
+		tab0 = Part.makeBox(base_thickness,14,4,Base.Vector(0,0,0))
+		tab1 = Part.makeBox(base_thickness,14,4,Base.Vector(0,28,0))
+		tab2 = Part.makeBox(base_thickness,14,4,Base.Vector(0,56,0))
+		tab3 = Part.makeBox(16.5,3,4,Base.Vector(0,67,0))
+		tab4 = Part.makeBox(16.5,3,4,Base.Vector(31.5,67,0))
+		tab5 = Part.makeBox(top_thickness,14,4,Base.Vector(45,56,0))
+		tab6 = Part.makeBox(top_thickness,14,4,Base.Vector(45,28,0))
+		tab7 = Part.makeBox(top_thickness,14,4,Base.Vector(45,0,0))
+		tab8 = Part.makeBox(16.5,3,4,Base.Vector(31.5,0,0))
+		tab9 = Part.makeBox(16.5,3,4,Base.Vector(0,0,0))	
+		#apparently, cutting through overlapping negative spaces does weird things in FreeCAD, so we'll break this up a bit...
+		tabs = Part.makeCompound([tab0,tab1,tab2,tab5,tab6,tab7])
+		side.Shape = side.Shape.cut(tabs)
+		side.Shape = side.Shape.cut(tab3)
+		side.Shape = side.Shape.cut(tab4)
+		side.Shape = side.Shape.cut(tab8)
+		side.Shape = side.Shape.cut(tab9)
+	placement = App.Placement(App.Vector(dx,dy,0), App.Vector(1,0,0), 0)
+	side.Placement = placement
+	return side	
+
+def make_inner_walls(side_type,dx,dy,name,is_long_wall,top_thickness,base_thickness,show):
+	side = App.ActiveDocument.addObject('Part::Feature',name)
+	#build shape and negative space for tabs / holes
+	side.Shape = Part.makeBox(48,56,3)
+	tab0 = Part.makeBox(base_thickness,13,4,Base.Vector(0,0,0))
+	tab1 = Part.makeBox(base_thickness,10,4,Base.Vector(0,23,0))
+	tab2 = Part.makeBox(base_thickness,13,4,Base.Vector(0,43,0))
+	tab4 = Part.makeBox(top_thickness,13,4,Base.Vector(45,43,0))
+	tab5 = Part.makeBox(top_thickness,10,4,Base.Vector(45,23,0))
+	tab6 = Part.makeBox(top_thickness,13,4,Base.Vector(45,0,0))
+	extra_holes = []
+	if side_type == "board":
+		screwhole1 = Part.makeCylinder(1.3,4,Base.Vector(12.8,28,0))
+		screwhole2 = Part.makeCylinder(1.3,4,Base.Vector(38.2,28,0))
+		pins_hole1 = Part.makeBox(16,2.6,4,Base.Vector(17.5,28-6.5-1.3))
+		pins_hole2 = Part.makeBox(16,2.6,4,Base.Vector(17.5,28+6.5-1.3))
+		extra_holes = Part.makeCompound([screwhole1,screwhole2,pins_hole1,pins_hole2])
+	elif side_type == "led":
+		led_hole = Part.makeCylinder(2.5,4,Base.Vector(28.8,28,0))
+		extra_holes = Part.makeCompound([led_hole])
+	else:
+		extra_holes = Part.makeCompound([])		
+	tabs = Part.makeCompound([tab0,tab1,tab2,tab4,tab5,tab6])
+	side.Shape = side.Shape.cut(tabs)
+	side.Shape = side.Shape.cut(extra_holes)
+	if is_long_wall: 
+		tab3 = Part.makeBox(13,3,4,Base.Vector(17.5,53,0))
+		tab7 = Part.makeBox(13,3,4,Base.Vector(17.5,0,0))
+		side.Shape = side.Shape.cut(tab3)
+		side.Shape = side.Shape.cut(tab7)
+	else: 
+		tab3 = Part.makeBox(17.5,3,4,Base.Vector(0,0,0))
+		tab7 = Part.makeBox(17.5,3,4,Base.Vector(0,53,0))
+		tab8 = Part.makeBox(17.5,3,4,Base.Vector(30.5,53,0))
+		tab9 = Part.makeBox(17.5,3,4,Base.Vector(30.5,0,0))	
+		#apparently, cutting through overlapping negative spaces does weird things in FreeCAD, so we'll break this up a bit...
+		side.Shape = side.Shape.cut(tab3)
+		side.Shape = side.Shape.cut(tab7)
+		side.Shape = side.Shape.cut(tab8)
+		side.Shape = side.Shape.cut(tab9)
+	placement = App.Placement(App.Vector(dx,dy,0), App.Vector(1,0,0), 0)
+	side.Placement = placement
+	return side	
+
+def make_battery_cover_or_anchor(dx,dy,name,thickness,show):
+	#build shape and negative space for tabs / holes
+	if name == "battery_anchor":
+		side = App.ActiveDocument.addObject('Part::Feature',name)
+		side.Shape = Part.makeBox(48,71.5,3)
+		sh0 = Part.makeCylinder(1.5,4,Base.Vector(5.25,4,0))
+		sh1 = Part.makeCylinder(1.5,4,Base.Vector(24,4,0))
+		sh2 = Part.makeCylinder(1.5,4,Base.Vector(42.75,4,0))
+		sh3 = Part.makeCylinder(1.5,4,Base.Vector(5.25,67.5,0))
+		sh4 = Part.makeCylinder(1.5,4,Base.Vector(24,67.5,0))
+		sh5 = Part.makeCylinder(1.5,4,Base.Vector(42.75,67.5,0))
+		holes = Part.makeCompound([sh0,sh1,sh2,sh3,sh4,sh5])	
+		side.Shape = side.Shape.cut(holes)
+		placement = App.Placement(App.Vector(dx,dy,0), App.Vector(1,0,0), 0)
+		side.Placement = placement
+		return side
+	else:
+
+		battery_cover = Part.makeBox(57.5,72.5,4,Base.Vector(0,0,0))
+		battery_cover = battery_cover.makeFillet(6,[battery_cover.Edges[0],battery_cover.Edges[2],battery_cover.Edges[4],battery_cover.Edges[6]])
+		
+		bc = App.ActiveDocument.addObject('Part::Feature', name)
+		bc.Shape = battery_cover
+		sh0 = Part.makeCylinder(1.5,4,Base.Vector(10,4,0))
+		sh1 = Part.makeCylinder(1.5,4,Base.Vector(28.75,4,0))
+		sh2 = Part.makeCylinder(1.5,4,Base.Vector(47.5,4,0))
+		sh3 = Part.makeCylinder(1.5,4,Base.Vector(10,67.5,0))
+		sh4 = Part.makeCylinder(1.5,4,Base.Vector(28.5,67.5,0))
+		sh5 = Part.makeCylinder(1.5,4,Base.Vector(47.5,67.5,0))
+		holes = Part.makeCompound([sh0,sh1,sh2,sh3,sh4,sh5])	
+		bc.Shape = bc.Shape.cut(holes)		
+		placement = App.Placement(App.Vector(dx,dy,0), App.Vector(1,0,0), 0)
+		bc.Placement = placement
+		
+		'''
+		bc0 = Part.makeBox(18.75,65,3)
+		bc0 = bc0.makeFillet(6,[bc0.Edges[0],bc0.Edges[4]])
+		bc0 = bc0.makeFillet(2,[bc0.Edges[2]])
+		bc1 = Part.makeBox(18.75,65,3)
+		bc1 = bc1.makeFillet(6,[bc1.Edges[2],bc1.Edges[6]])
+		bc1.translate(Base.Vector(18.74,8,0))
+		bc2 = Part.makeBox(18.75,65,3)
+		bc2 = bc2.makeFillet(6,[bc2.Edges[0],bc2.Edges[4]])
+		#bc2 = bc2.makeFillet(2,[bc2.Edges[]])
+		bc2.translate(Base.Vector(37.49,0,0))
+		bc0 = bc0.fuse(bc1)
+		bc0.removeSplitter()
+		bc0 = bc0.fuse(bc2)
+		bc0.removeSplitter()
+		bc = App.ActiveDocument.addObject('Part::Feature', name)
+		bc.Shape = bc0
+		sh0 = Part.makeCylinder(1.5,4,Base.Vector(9.375,4,0))
+		sh1 = Part.makeCylinder(1.5,4,Base.Vector(28.125,69,0))
+		sh2 = Part.makeCylinder(1.5,4,Base.Vector(46.875,4,0))
+		bc.Shape = bc.Shape.cut(sh0)
+		bc.Shape = bc.Shape.cut(sh1)
+		bc.Shape = bc.Shape.cut(sh2)
+		placement = App.Placement(App.Vector(dx,dy,0), App.Vector(1,0,0), 0)
+		bc.Placement = placement
+		App.ActiveDocument.recompute()
+		#Part.show(bc0.Shape)
+		'''
+		return battery_cover
+	
+
+battery = "4xaa"
+
+top_thickness = 3
+base_thickness = 3
+top = make_top_or_bottom(battery,0,0,"case_top",True, True)
+base = make_top_or_bottom(battery,0,174,"case_bottom",False,True)
+top_outside = make_outer_walls(80,160,"top_outside",False,top_thickness,base_thickness,True)
+left_outside = make_outer_walls(80,0,"left_outside",True,top_thickness,base_thickness,True)
+right_outside = make_outer_walls(133,0,"right_outside",True,top_thickness,base_thickness,True)
+bottom_outside = make_outer_walls(133,160,"bottom_outside",False,top_thickness,base_thickness,True)
+top_inside = make_inner_walls("none",186,0,"top_inside",False,top_thickness,base_thickness,True)
+left_inside = make_inner_walls("led",186,59,"left_inside",True,top_thickness,base_thickness,True)
+bottom_inside = make_inner_walls("board",186,120,"bottom_inside",False,top_thickness,base_thickness,True)
+right_inside = make_inner_walls("none",186,180,"right_inside",True,top_thickness,base_thickness,True)
+battery_back = make_battery_cover_or_anchor(80,240,"battery_anchor",top_thickness,True)
+battery_cover = make_battery_cover_or_anchor(133,240,"battery_cover",top_thickness,True)

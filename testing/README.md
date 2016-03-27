@@ -1,0 +1,2 @@
+#Testing
+An academic evaluation of an earlier version of the `basic-handheld-turbidimeter` was published in the open-access journal [Sensors](http://www.mdpi.com/1424-8220/14/4/7142); the article and supplementary materials are included in this folder.
